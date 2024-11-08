@@ -1,0 +1,26 @@
+.navigation-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #0066cc;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 24px;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navigation-bar button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.navigation-bar button:hover {
+    color: #ffdd57;
+}
