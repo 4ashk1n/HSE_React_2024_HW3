@@ -3,15 +3,35 @@ import React, { useState } from 'react';
 import NavigationBar from './components/NavigationBar';
 import SideBar from './components/SideBar';
 import ProductCard from './components/ProductCard';
+import { Grid2, Container, Pagination, Drawer } from '@mui/material';
 import ProductModal from './components/ProductModal';
 import { Product } from './types/Product';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css';
 
-const App: React.FC = () => {
-    // Состояние для отслеживания выбранного товара
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#abdcfa',
+        }
+    },
+    typography: {
+        fontFamily: 'Roboto, Arial, sans-serif',
+        fontSize: 14,
+    },
+});
 
-    // Фиктивные данные для отображения различных товаров
+const App: React.FC = () => {
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [filters, setFilters] = useState({
+        search: '',
+        category: '',
+        inStock: false,
+    });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const itemsPerPage = 6;
+
     const products: Product[] = [
         // Категория: Электроника
         {
@@ -102,26 +122,62 @@ const App: React.FC = () => {
     ];
 
 
+    const filteredProducts = products.filter((product) => {
+        const matchesSearch = new RegExp(filters.search, 'i').test(product.name);
+        const matchesCategory = filters.category ? product.category === filters.category : true;
+        const matchesStock = filters.inStock ? product.quantity > 0 : true;
+        return matchesSearch && matchesCategory && matchesStock;
+    });
+
+    const paginatedProducts = filteredProducts.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+        setCurrentPage(page);
+    };
+
     return (
-        <div className="app">
-            <NavigationBar />
-            <SideBar />
-            <div className="product-list">
-                {products.map((product) => (
-                    <ProductCard
-                        key={product.id}
-                        product={product}
-                        onClick={() => setSelectedProduct(product)}
+        <ThemeProvider theme={theme}>
+            <div className="app">
+                <NavigationBar toggleSidebar={() => setIsDrawerOpen(!isDrawerOpen)} />
+                <Drawer
+                    anchor="left"
+                    open={isDrawerOpen}
+                    onClose={() => setIsDrawerOpen(false)}
+                >
+                    <SideBar filters={filters} setFilters={setFilters} />
+                </Drawer>
+
+                <Container maxWidth="md" >
+                    <Grid2 container spacing={2} pt={20}>
+                        {paginatedProducts.map((product) => (
+                            <Grid2 size={4} >
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onClick={() => setSelectedProduct(product)}
+                                />
+                            </Grid2>
+
+                        ))}
+                    </Grid2>
+                    <Pagination
+                        count={Math.ceil(filteredProducts.length / itemsPerPage)}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}
                     />
-                ))}
+                </Container>
+                {selectedProduct && (
+                    <ProductModal
+                        product={selectedProduct}
+                        onClose={() => setSelectedProduct(null)}
+                    />
+                )}
             </div>
-            {selectedProduct && (
-                <ProductModal
-                    product={selectedProduct}
-                    onClose={() => setSelectedProduct(null)}
-                />
-            )}
-        </div>
+        </ThemeProvider>
     );
 };
 

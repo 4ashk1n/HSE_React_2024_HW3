@@ -1,34 +1,51 @@
 import React from 'react';
+import { Card, CardContent, CardMedia, Tooltip, Typography } from '@mui/material';
 import { Product } from '../types/Product';
-import '../styles/ProductCard.css';
 
 interface ProductCardProps {
     product: Product;
     onClick: () => void;
 }
 
-// Компонент карточки товара
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
     const { name, description, category, quantity, unit, image } = product;
 
     return (
-        <div className="product-card" onClick={onClick}>
-            {/* Изображение товара или сообщение об отсутствии изображения */}
-            {image ? (
-                <img src={image} alt={name} className="product-image" />
-            ) : (
-                <div className="no-image">Изображение отсутствует</div>
-            )}
-            <h3 className="product-name">{name}</h3>
-            <p className="product-description">{description}</p>
-            <div className="product-footer">
-                <p className="product-category">Категория: {category}</p>
-                <p className="product-quantity">
-                    Количество: {quantity} {unit}
-                </p>
-            </div>
-        </div>
+        <Tooltip
+            title={
+                description.length > 50
+                    ? `${description.slice(0, 47)}...`
+                    : description
+            }
+            arrow
+        >
+            <Card onClick={onClick} style={{ cursor: 'pointer' }}>
+                {image ? (
+                    <CardMedia
+                        component="img"
+                        height="140"
+                        image={image}
+                        alt={name}
+                    />
+                ) : (
+                    <Typography variant="h6" style={{ padding: '20px', textAlign: 'center' }}>
+                        Изображение отсутствует
+                    </Typography>
+                )}
+                <CardContent>
+                    <Typography variant="h6" noWrap>
+                        {name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" noWrap>
+                        {category}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                        {quantity} {unit}
+                    </Typography>
+                </CardContent>
+            </Card>
+        </Tooltip>
     );
 };
 

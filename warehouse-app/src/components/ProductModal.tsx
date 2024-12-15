@@ -1,32 +1,54 @@
+// src/components/ProductModal.tsx
 import React from 'react';
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    IconButton,
+    Typography,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { Product } from '../types/Product';
-import '../styles/ProductModal.css';
 
 interface ProductModalProps {
     product: Product;
     onClose: () => void;
 }
 
-// Компонент модального окна с подробной информацией о товаре
 const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
+    const { name, description, category, quantity, unit, image } = product;
+
     return (
-        <div className="modal">
-            <div className="modal-content">
-                {/* Кнопка закрытия модального окна */}
-                <button className="close-button" onClick={onClose}>×</button>
-
-                {/* Детали товара */}
-                <h2>{product.name}</h2>
-                <p>{product.description}</p>
-                <p>Категория: {product.category}</p>
-                <p>
-                    Количество: {product.quantity} {product.unit}
-                </p>
-
-                {/* Изображение товара, если доступно */}
-                {product.image && <img src={product.image} alt={product.name} />}
-            </div>
-        </div>
+        <Dialog open={true} onClose={onClose} maxWidth={'xs'}>
+            <DialogTitle>
+                {name}
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    style={{ position: 'absolute', right: 8, top: 8 }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+                {image && (
+                    <img
+                        src={image}
+                        alt={name}
+                        style={{ width: '100%', marginBottom: '16px' }}
+                    />
+                )}
+                <Typography variant="body1" gutterBottom>
+                    {description}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                    Категория: {category}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                    Количество: {quantity} {unit}
+                </Typography>
+            </DialogContent>
+        </Dialog>
     );
 };
 
